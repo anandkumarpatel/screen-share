@@ -16,6 +16,10 @@ async function main() {
     return next()
   })
 
+  app.get('/movie/:fpart', (req, res) => {
+    console.log("move", `./movie/${req.params.fpart}`)
+    res.sendFile(`./movie/${req.params.fpart}`, { root: __dirname });
+  });
 
   app.use(express.static('build'))
 

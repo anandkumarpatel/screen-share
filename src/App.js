@@ -45,29 +45,36 @@ class App extends Component {
 
   update(e) {
     console.log("update with", e)
-    let isPlaying = false
-    let skipUpdate = true
+    let isPlaying = this.state.isPlaying
     if (e.state === PLAY) {
       this.video.play()
       isPlaying = true
     } else if (e.state === PAUSE) {
       this.video.pause()
+      isPlaying = false
     } else if (e.state === RESET) {
       this.video.currentTime = 0
+      isPlaying = false
     } else if (e.state === SYNC) {
-      if (Math.abs(this.video.currentTime - e.currentTime) > 1) {
-        skipUpdate = false
-        console.log("Sync required", this.video.currentTime - e.currentTime)
+      if(this.state.isPlaying !== e.isPlaying) {
+        console.log("Sync required: Play state", this.state.isPlaying, "vs", e.isPlaying)
+        isPlaying = e.isPlaying
+        if (e.isPlaying) {
+          this.video.play()
+        } else {
+          this.video.pause()
+        }
+      }
+      if (Math.abs(this.video.currentTime - e.currentTime) > .1) {
+        console.log("Sync required: Time", this.video.currentTime, "vs",  e.currentTime)
+        this.video.currentTime = e.currentTime
       }
     }
-    if (!skipUpdate) {
-      this.video.currentTime = e.currentTime
-      const newState = {
-        isPlaying
-      }
-      this.setState(newState)
-      console.log("updated", newState)
+    const newState = {
+      isPlaying
     }
+    this.setState(newState)
+    console.log("updated", newState)
   }
 
   clicked(state) {
@@ -85,6 +92,7 @@ class App extends Component {
       this.timer = setInterval(() => {
         this.socket.emit("clicked", {
           state: SYNC,
+          isPlaying: this.state.isPlaying,
           currentTime: this.video.currentTime
         })
       }, 1000);
@@ -94,8 +102,17 @@ class App extends Component {
   render() {
     let video = () => {
       return (
-        <video className="Video" onPause={() => this.clicked(PAUSE)}  onPlay={() => this.clicked(PLAY)} ref={(c) => { this.video = c }} controls controlsList={ this.isMaster ? "" : "noplay nodownload noplaybackrate"}>
-          <source src="https://stream-test-123.s3.amazonaws.com/TEST+VIDEO.mp4" type="video/mp4"></source>
+        <video
+          id="my-video"
+          className="Video video-js"
+          onPause={() => this.clicked(PAUSE)}
+          onPlay={() => this.clicked(PLAY)}
+          ref={(c) => { this.video = c }}
+          preload="auto"
+          data-setup="{}"
+          controls>
+          {/* <source src="https://raw.githubusercontent.com/anandkumarpatel/screen-share/master/movie/playlist.m3u8" type="video/x-mpegURL"></source> */}
+          <source src="http://localhost:4001/movie/playlist.m3u8" type="video/x-mpegURL"></source>
         </video>
       )
     }
