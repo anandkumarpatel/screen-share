@@ -10,7 +10,7 @@ const SYNC = 4
 class App extends Component {
   constructor(up) {
     super(up)
-    this.isMaster = window.location.pathname === "/master"
+    this.isMaster = window.location.pathname === "/master" || (window.localStorage.getItem("master") === "true")
     this.video = null
     this.socket = null
     this.timer = null
