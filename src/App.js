@@ -23,8 +23,8 @@ class App extends Component {
 
   componentDidMount() {
     if (!this.socket) {
-      // this.socket = socketIOClient(`${window.location.href}`)
-      this.socket = socketIOClient(`http://localhost:4001`)
+      this.socket = socketIOClient(`${window.location.href}`)
+      // this.socket = socketIOClient(`http://localhost:4001`)
       this.socket.on("clicked", (e) => {
         console.log("clicked")
         return this.update(e)
@@ -112,7 +112,7 @@ class App extends Component {
           data-setup="{}"
           controls>
           {/* <source src="https://raw.githubusercontent.com/anandkumarpatel/screen-share/master/movie/playlist.m3u8" type="video/x-mpegURL"></source> */}
-          <source src="http://localhost:4001/movie/playlist.m3u8" type="video/x-mpegURL"></source>
+          <source src={window.location.href + "movie/playlist.m3u8"} type="video/x-mpegURL"></source>
         </video>
       )
     }
